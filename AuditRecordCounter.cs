@@ -21,6 +21,7 @@ using XrmToolBox.Extensibility.Interfaces;
 using Microsoft.Xrm.Sdk.Organization;
 using System.Web.Services.Description;
 using Sdmsols.XTB.AuditRecordCounterByTable.Helpers;
+using System.IO;
 
 namespace Sdmsols.XTB.AuditRecordCounterByTable
 {
@@ -535,5 +536,65 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             Process.Start(HelpUrl);
         }
 
+        private void tsbAudit_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                ExecuteMethod(GetAuditRecordCountByTable);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(@"an Error has occurred while processing.." + exception.Message);
+            }
+        }
+
+        private void tsbExportToExcel_Click(object sender, EventArgs e)
+        {
+            if(auditGridView.Rows.Count.Equals(0))
+            {
+                MessageBox.Show("No Data Present, Please Press Load Audit Record Count By Table button first!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                Title = "Save as CSV"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportDataGridViewToCSV(auditGridView, saveFileDialog.FileName);
+            }
+        }
+
+        private void ExportDataGridViewToCSV(DataGridView dgv, string filePath)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Write column headers
+            for (int i = 0; i < dgv.ColumnCount; i++)
+            {
+                sb.Append(dgv.Columns[i].HeaderText + ",");
+            }
+            sb.AppendLine();
+
+            // Write rows
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    for (int i = 0; i < dgv.ColumnCount; i++)
+                    {
+                        sb.Append(row.Cells[i].Value?.ToString().Replace(",", " ") + ",");
+                    }
+                    sb.AppendLine();
+                }
+            }
+
+            File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+            MessageBox.Show("Data exported successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }
