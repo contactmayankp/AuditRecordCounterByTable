@@ -224,6 +224,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NuguetPackage\Sdmsols.XTB.AuditRecordCounterByTable.1.2025.0.1.nupkg" />
+    <None Include="NuguetPackage\Sdmsols.XTB.AutoNumberUpdater.1.2025.0.1.nupkg" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +240,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Icons\SDMIcon.png" />
+    <Content Include="NuguetPackage\package.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
