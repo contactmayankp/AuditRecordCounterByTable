@@ -191,6 +191,16 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
 
             var entityList = MetadataHelper.LoadEntities(this.Service);
 
+            if (entityList != null)
+            {
+                //MessageBox.Show($"Found {result.Entities.Count} contacts");
+                LogTextBoxAndProgressBar.UpdateStatusMessage(StatusText, $"Found  total tables {entityList.EntityMetadata.Count}...");
+            }
+
+            if (entityList != null)
+                LogTextBoxAndProgressBar.SetProgressBar(progressBar, entityList.EntityMetadata.Count);
+
+
             var results = new List<EntityInfo>();
             foreach (var entityMetadata in entityList.EntityMetadata)
             {
@@ -210,6 +220,8 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
                 int count = (int)(auditEntity[0]["count"] as AliasedValue).Value;
 
                 results.Add(new EntityInfo() { AuditEnabled = isAuditEnabled, EntityName=entityMetadata.LogicalName, ObjectTypeCode= entityMetadata.ObjectTypeCode.Value, Count=count });
+
+                LogTextBoxAndProgressBar.AddProgressStep(progressBar);
             }
 
             return results;
@@ -236,14 +248,7 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
                         MessageBox.Show(args.Error.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     var result = args.Result as List<EntityInfo>;
-                    if (result != null)
-                    {
-                        //MessageBox.Show($"Found {result.Entities.Count} contacts");
-                        LogTextBoxAndProgressBar.UpdateStatusMessage(StatusText, $"Found  total tables {result.Count}...");
-                    }
-
-                    if (result != null)
-                        LogTextBoxAndProgressBar.SetProgressBar(progressBar, result.Count);
+                   
 
 
                     LoadGridView(result);

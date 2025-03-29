@@ -41,8 +41,13 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.auditGridView = new System.Windows.Forms.DataGridView();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.backgroundWorker3 = new System.ComponentModel.BackgroundWorker();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.backgroundWorker4 = new System.ComponentModel.BackgroundWorker();
             this.toolStripMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.auditGridView)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripMenu
@@ -83,12 +88,10 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             // 
             // progressBar
             // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(4, 110);
+            this.progressBar.Location = new System.Drawing.Point(4, 131);
             this.progressBar.Margin = new System.Windows.Forms.Padding(4);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(988, 27);
+            this.progressBar.Size = new System.Drawing.Size(1021, 27);
             this.progressBar.TabIndex = 26;
             this.progressBar.Visible = false;
             // 
@@ -97,21 +100,21 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             this.StatusText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.StatusText.Location = new System.Drawing.Point(0, 644);
+            this.StatusText.Location = new System.Drawing.Point(-4, 127);
             this.StatusText.Margin = new System.Windows.Forms.Padding(4);
             this.StatusText.Multiline = true;
             this.StatusText.Name = "StatusText";
             this.StatusText.ReadOnly = true;
             this.StatusText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.StatusText.Size = new System.Drawing.Size(1000, 35);
+            this.StatusText.Size = new System.Drawing.Size(1024, 35);
             this.StatusText.TabIndex = 27;
             // 
             // btnFixAutoNumbers
             // 
-            this.btnFixAutoNumbers.Location = new System.Drawing.Point(4, 31);
+            this.btnFixAutoNumbers.Location = new System.Drawing.Point(7, 13);
             this.btnFixAutoNumbers.Margin = new System.Windows.Forms.Padding(4);
             this.btnFixAutoNumbers.Name = "btnFixAutoNumbers";
-            this.btnFixAutoNumbers.Size = new System.Drawing.Size(180, 71);
+            this.btnFixAutoNumbers.Size = new System.Drawing.Size(252, 71);
             this.btnFixAutoNumbers.TabIndex = 37;
             this.btnFixAutoNumbers.Text = "Load Audit Record Count By Table";
             this.btnFixAutoNumbers.UseVisualStyleBackColor = true;
@@ -126,21 +129,41 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             // auditGridView
             // 
             this.auditGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.auditGridView.Location = new System.Drawing.Point(3, 144);
+            this.auditGridView.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.auditGridView.Location = new System.Drawing.Point(0, 212);
             this.auditGridView.Name = "auditGridView";
             this.auditGridView.RowHeadersWidth = 51;
             this.auditGridView.RowTemplate.Height = 24;
-            this.auditGridView.Size = new System.Drawing.Size(989, 493);
+            this.auditGridView.Size = new System.Drawing.Size(1025, 469);
             this.auditGridView.TabIndex = 38;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btnFixAutoNumbers);
+            this.groupBox1.Controls.Add(this.StatusText);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox1.Location = new System.Drawing.Point(0, 27);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(1025, 169);
+            this.groupBox1.TabIndex = 39;
+            this.groupBox1.TabStop = false;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Location = new System.Drawing.Point(0, 198);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(1019, 480);
+            this.groupBox2.TabIndex = 40;
+            this.groupBox2.TabStop = false;
             // 
             // AuditRecordCounterByTable
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.auditGridView);
-            this.Controls.Add(this.btnFixAutoNumbers);
-            this.Controls.Add(this.StatusText);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.toolStripMenu);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AuditRecordCounterByTable";
@@ -150,6 +173,8 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             this.toolStripMenu.ResumeLayout(false);
             this.toolStripMenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.auditGridView)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -168,5 +193,9 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.DataGridView auditGridView;
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker3;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.ComponentModel.BackgroundWorker backgroundWorker4;
     }
 }
