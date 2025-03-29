@@ -8,8 +8,8 @@
     <ProjectGuid>{62D850ED-1616-4058-8C6B-F1253BDBAEAF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sdmsols.XTB.AutoNumberUpdater</RootNamespace>
-    <AssemblyName>Sdmsols.XTB.AutoNumberUpdater</AssemblyName>
+    <RootNamespace>Sdmsols.XTB.AuditRecordCounterByTable</RootNamespace>
+    <AssemblyName>Sdmsols.XTB.AuditRecordCounterByTable</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -205,11 +205,11 @@
     <Compile Include="Helpers\LogTextBoxAndProgressBar.cs" />
     <Compile Include="Helpers\MetadataHelper.cs" />
     <Compile Include="MyPlugin.cs" />
-    <Compile Include="AutoNumberUpdater.cs">
+    <Compile Include="AuditRecordCounter.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="AutoNumberUpdater.designer.cs">
-      <DependentUpon>AutoNumberUpdater.cs</DependentUpon>
+    <Compile Include="AuditRecordCounter.designer.cs">
+      <DependentUpon>AuditRecordCounter.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -225,8 +225,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AutoNumberUpdater.resx">
-      <DependentUpon>AutoNumberUpdater.cs</DependentUpon>
+    <EmbeddedResource Include="AuditRecordCounter.resx">
+      <DependentUpon>AuditRecordCounter.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

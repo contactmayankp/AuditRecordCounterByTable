@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk.Metadata;
 
-namespace Sdmsols.XTB.AutoNumberUpdater
+namespace Sdmsols.XTB.AuditRecordCounterByTable
 {
     internal class EntityMetadataProxy
     {

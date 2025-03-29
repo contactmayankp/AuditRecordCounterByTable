@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AutoNumberUpdater")]
-[assembly: AssemblyDescription("XrmToolBox plugin to update Auto Number values where records are missing auto number in Microsoft Dynamics 365")]
+[assembly: AssemblyTitle("AuditRecordCounterByTable")]
+[assembly: AssemblyDescription("XrmToolBox plugin tool to get Number of records in Audit table by Each Data verse Tables")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SDMSolutionsLimited")]
-[assembly: AssemblyProduct("AutoNumberUpdater")]
+[assembly: AssemblyProduct("AuditRecordCounterByTable")]
 [assembly: AssemblyCopyright("Copyright © SDMSolutionsLimited 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -21,9 +21,9 @@ using XrmToolBox.Extensibility.Interfaces;
 using Microsoft.Xrm.Sdk.Organization;
 using System.Web.Services.Description;
 
-namespace Sdmsols.XTB.AutoNumberUpdater
+namespace Sdmsols.XTB.AuditRecordCounterByTable
 {
-    public partial class AutoNumberUpdater : PluginControlBase,IGitHubPlugin, IPayPalPlugin, IMessageBusHost, IHelpPlugin, IStatusBarMessenger, IAboutPlugin
+    public partial class AuditRecordCounterByTable : PluginControlBase,IGitHubPlugin, IPayPalPlugin, IMessageBusHost, IHelpPlugin, IStatusBarMessenger, IAboutPlugin
     {
         #region Constructor and Class Variables
 
@@ -48,7 +48,7 @@ namespace Sdmsols.XTB.AutoNumberUpdater
             StateCodes=4
         }
 
-        public AutoNumberUpdater()
+        public AuditRecordCounterByTable()
         {
             InitializeComponent();
         }
@@ -57,7 +57,7 @@ namespace Sdmsols.XTB.AutoNumberUpdater
 
         #region XrmToolBox Plug In Methods
 
-        private void AutoNumberUpdater_Load(object sender, EventArgs e)
+        private void AuditRecordCounterByTable_Load(object sender, EventArgs e)
         {
            // ShowInfoNotification("This is a notification that can lead to XrmToolBox repository", new Uri("https://github.com/MscrmTools/XrmToolBox"));
 
@@ -93,7 +93,7 @@ namespace Sdmsols.XTB.AutoNumberUpdater
             }
         }
 
-        private void AutoNumberUpdater_ConnectionUpdated(object sender, ConnectionUpdatedEventArgs e)
+        private void AuditRecordCounterByTable_ConnectionUpdated(object sender, ConnectionUpdatedEventArgs e)
         {
             var orgver = new Version(e.ConnectionDetail.OrganizationVersion);
             var orgok = orgver >= new Version(9, 0);
@@ -118,7 +118,7 @@ namespace Sdmsols.XTB.AutoNumberUpdater
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AutoNumberUpdater_OnCloseTool(object sender, System.EventArgs e)
+        private void AuditRecordCounterByTable_OnCloseTool(object sender, System.EventArgs e)
         {
 
             // Before leaving, save the settings
@@ -869,14 +869,14 @@ namespace Sdmsols.XTB.AutoNumberUpdater
 
         #region Interface Members
 
-        public string RepositoryName => "AutoNumberUpdater";
+        public string RepositoryName => "AuditRecordCounterByTable";
 
         public string UserName => "contactmayankp";
         
         public string DonationDescription => "Auto Number Updater";
         public string EmailAccount => "mayank.pujara@gmail.com";
 
-        public string HelpUrl => "https://mayankp.wordpress.com/2021/12/09/xrmtoolbox-autonumberupdater-new-tool/";
+        public string HelpUrl => "https://mayankp.wordpress.com/2021/12/09/xrmtoolbox-AuditRecordCounterByTable-new-tool/";
 
 
         #endregion

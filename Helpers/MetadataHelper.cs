@@ -5,7 +5,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Metadata.Query;
 
-namespace Sdmsols.XTB.AutoNumberUpdater
+namespace Sdmsols.XTB.AuditRecordCounterByTable
 {
     public static class MetadataHelper
     {

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using Logging;
 
-namespace Sdmsols.XTB.AutoNumberUpdater
+namespace Sdmsols.XTB.AuditRecordCounterByTable
 {
     internal static class LogTextBoxAndProgressBar
     {
