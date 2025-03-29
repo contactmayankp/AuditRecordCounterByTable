@@ -20,6 +20,7 @@ using XrmToolBox.Extensibility.Args;
 using XrmToolBox.Extensibility.Interfaces;
 using Microsoft.Xrm.Sdk.Organization;
 using System.Web.Services.Description;
+using Sdmsols.XTB.AuditRecordCounterByTable.Helpers;
 
 namespace Sdmsols.XTB.AuditRecordCounterByTable
 {
@@ -100,8 +101,7 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
 
             if (orgok)
             {
-                LoadSolutions();
-                LoadEntities();
+                //GetAuditRecordCountByTable();
             }
             else
             {
@@ -131,68 +131,12 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
         
         #region Control Events
 
-        private void cmbSolution_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            DisableControls((int)ControlSelected.Solutions);
-            if (cmbSolution.SelectedItem != null)
-            {
-                FilterEntities();
-            }
-        }
-
-        private void cmbEntities_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-            DisableControls((int)ControlSelected.Entities);
-            if (cmbEntities.SelectedItem != null)
-            {
-                _selectedEntity = (EntityMetadataProxy) cmbEntities.SelectedItem;
-
-                LoadStateCodes();
-                LoadAttributes(false);
-            }
-        }
-
-        private void cmbStateCodes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            DisableControls((int)ControlSelected.StateCodes);
-            if (cmbStateCodes.SelectedValue != null && cmbStateCodes.SelectedValue is int)
-            {
-                _stateCode = (int)cmbStateCodes.SelectedValue;
-            }
-        }
-
-        private void cmbAttributes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            DisableControls((int)ControlSelected.Attributes);
-
-            if (cmbAttributes.SelectedItem != null)
-            {
-                _selectedAttributeMetadata = (AttributeProxy) cmbAttributes.SelectedItem;
-
-                if (_selectedAttributeMetadata != null)
-                {
-                    var selectedFormat = _selectedAttributeMetadata.attributeMetadata.AutoNumberFormat;
-                    int nextValue = GuessSeed();
-                    txtSample.Text = ParseNumberFormat(selectedFormat, nextValue.ToString());
-
-                    if (!string.IsNullOrEmpty(txtSample.Text))
-                    {
-                        btnFixAutoNumbers.Enabled = true;
-                    }
-                }
-            }
-
-
-
-        }
-
         private void btnFixAutoNumbers_Click(object sender, EventArgs e)
         {
             try
             {
 
-                ExecuteMethod(GetRecordsAndFixAutoNumbers);
+                ExecuteMethod(GetAuditRecordCountByTable);
             }
             catch (Exception exception)
             {
@@ -205,44 +149,6 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
         
         #region Private Helper Methods
 
-        private void LoadSolutions()
-        {
-            cmbSolution.Items.Clear();
-            cmbSolution.Enabled = false;
-            WorkAsync(new WorkAsyncInfo("Loading solutions...",
-                (eventargs) =>
-                {
-                    var qx = new QueryExpression("solution");
-                    qx.ColumnSet.AddColumns("friendlyname", "uniquename");
-                    qx.AddOrder("installedon", OrderType.Ascending);
-                    //qx.Criteria.AddCondition("ismanaged", ConditionOperator.Equal, false);
-                    qx.Criteria.AddCondition("isvisible", ConditionOperator.Equal, true);
-                    var lePub = qx.AddLink("publisher", "publisherid", "publisherid");
-                    lePub.EntityAlias = "P";
-                    lePub.Columns.AddColumns("customizationprefix");
-                    eventargs.Result = Service.RetrieveMultiple(qx);
-                })
-            {
-                PostWorkCallBack = (completedargs) =>
-                {
-                    if (completedargs.Error != null)
-                    {
-                        MessageBox.Show(completedargs.Error.Message);
-                    }
-                    else
-                    {
-                        if (completedargs.Result is EntityCollection)
-                        {
-                            var solutions = (EntityCollection)completedargs.Result;
-                            var proxiedsolutions = solutions.Entities.Select(s => new SolutionProxy(s)).OrderBy(s => s.ToString());
-                            cmbSolution.Items.AddRange(proxiedsolutions.ToArray());
-                            cmbSolution.Enabled = true;
-                        }
-                    }
-                    
-                }
-            });
-        }
 
         private void LoadEntities()
         {
@@ -272,322 +178,54 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
             });
         }
 
-        private void FilterEntities()
+      
+  
+        private void LoadGridView(List<EntityInfo> results)
         {
-            cmbEntities.Items.Clear();
-            cmbEntities.Enabled = false;
-
-            var solution = cmbSolution.SelectedItem as SolutionProxy;
-            if (solution == null)
-            {
-                return;
-            }
             
-            WorkAsync(new WorkAsyncInfo("Filtering entities...",
-                (eventargs) =>
-                {
-                    
-                    var qx = new QueryExpression("solutioncomponent");
-                    qx.ColumnSet.AddColumns("objectid");
-                    qx.Criteria.AddCondition("componenttype", ConditionOperator.Equal, 1);
-                    qx.Criteria.AddCondition("solutionid", ConditionOperator.Equal, solution.Solution.Id);
-                    eventargs.Result = Service.RetrieveMultiple(qx);
-                })
-            {
-                PostWorkCallBack = (completedargs) =>
-                {
-                    if (completedargs.Error != null)
-                    {
-                        MessageBox.Show(completedargs.Error.Message);
-                    }
-                    else
-                    {
-                        if (completedargs.Result is EntityCollection)
-                        {
-                            var includedentities = (EntityCollection)completedargs.Result;
-                            var filteredentities = _entities.Where(e => includedentities.Entities.Select(i => i["objectid"]).Contains(e.Metadata.MetadataId));
-                            cmbEntities.Items.AddRange(filteredentities.ToArray());
-                        }
-                    }
-                    cmbEntities.Enabled = true;
-                }
-            });
-        }
-
-        private void LoadStateCodes()
-        {
-            //cmbStateCodes.Items.Clear();
-            cmbStateCodes.Enabled = false;
-            var entity = cmbEntities.SelectedItem as EntityMetadataProxy;
-
-            WorkAsync(new WorkAsyncInfo("Filtering entities...",
-            (eventargs) =>
-            {
-
-                var attributeRequest = new RetrieveAttributeRequest
-                {
-                    EntityLogicalName = entity.Metadata.LogicalName,
-                    LogicalName = "statecode",
-                    RetrieveAsIfPublished = true
-                };
-
-                var attributeResponse = (RetrieveAttributeResponse)Service.Execute(attributeRequest);
-                var attributeMetadata = (EnumAttributeMetadata)attributeResponse.AttributeMetadata;
-
-                var optionList = (from o in attributeMetadata.OptionSet.Options
-                                  select new KeyValuePair<string,int>(o.Label.UserLocalizedLabel.Label, o.Value.Value)).ToList();
-
-                optionList.Insert(0, new KeyValuePair<string, int>("Default (No StateCode Filter)", -1));
-
-                eventargs.Result = optionList;
-            })
-            {
-                PostWorkCallBack = (completedargs) =>
-                {
-                    if (completedargs.Error != null)
-                    {
-                        MessageBox.Show(completedargs.Error.Message);
-                    }
-                    else
-                    {
-                        if (completedargs.Result is List<KeyValuePair<string, int>>)
-                        {
-                            var options = (List<KeyValuePair<string, int>>)completedargs.Result;
-                            cmbStateCodes.Enabled = true;
-                            cmbStateCodes.ValueMember = "Value";
-                            cmbStateCodes.DisplayMember = "Key";
-                            cmbStateCodes.DataSource = options;
-                        }
-                    }
-
-                }
-            });
-        }
-
-        private void LoadAttributes(bool force)
-        {
-            cmbAttributes.Items.Clear();
-            cmbAttributes.Enabled = false;
-            var entity = cmbEntities.SelectedItem as EntityMetadataProxy;
-            var onlyNumbered = true;
-            WorkAsync(new WorkAsyncInfo("Loading auto number attributes...",
-                (eventargs) =>
-                {
-                    if (force || entity.Metadata.Attributes == null)
-                    {
-                        eventargs.Result = MetadataHelper.LoadEntityDetails(Service, entity.Metadata.LogicalName).EntityMetadata.FirstOrDefault();
-                    }
-                    else
-                    {
-                        eventargs.Result = entity.Metadata;
-                    }
-                })
-            {
-                PostWorkCallBack = (completedargs) =>
-                {
-                    if (completedargs.Result is EntityMetadata)
-                    {
-                        try
-                        {
-                            entity.Metadata = (EntityMetadata)completedargs.Result;
-                            var attributes = entity.Metadata.Attributes
-                              .Where(a => a.AttributeType == AttributeTypeCode.String &&
-                                  a.IsValidForCreate.Value == true &&
-                                  a.IsCustomizable.Value == true &&
-                                  (!onlyNumbered || !string.IsNullOrEmpty(a.AutoNumberFormat)))
-                              .Select(a => new AttributeProxy((StringAttributeMetadata)a)).OrderBy(a => a.LogicalName).ToList();
-                            var bindingList = new BindingList<AttributeProxy>(attributes);
-                            var source = new BindingSource(bindingList, null);
-
-                            cmbAttributes.Enabled = true;
-                            cmbAttributes.Items.AddRange(bindingList.ToArray());
-
-                        }
-                        catch (MissingMethodException mex)
-                        {
-                            //LogUse("IncompatibleSDK");
-                            MessageBox.Show("It seems you are using too old SDK, that is unaware of the AutoNumberFormat property.", "SDK error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                }
-            });
-        }
-        
-        private void DisableControls(int controlSelected)
-        {
-            switch (controlSelected)
-            {
-                case (int)ControlSelected.Solutions:
-                    cmbEntities.Items.Clear();
-                    cmbEntities.Enabled = false;
-                    cmbAttributes.Items.Clear();
-                    cmbAttributes.Enabled = false;
-                    cmbStateCodes.DataSource = null;
-                    cmbStateCodes.Enabled = false;
-                    txtSample.Text = "";
-                    btnFixAutoNumbers.Enabled = false;
-                    _stateCode = -1;
-                    break;
-                case (int)ControlSelected.Entities:
-                    cmbAttributes.Items.Clear();
-                    cmbAttributes.Enabled = false;
-                    txtSample.Text = "";
-                    btnFixAutoNumbers.Enabled = false;
-                    break;
-                case (int)ControlSelected.Attributes:
-                    txtSample.Text = "";
-                    btnFixAutoNumbers.Enabled = false;
-                    break;
-                case (int)ControlSelected.StateCodes:
-                    break;
-
-
-            }
-        }
-        
-        private void FixEntityAutoNumbers(EntityCollection results)
-        {
-            var selectedFormat = "";
-
-            var selectedAttribute = _selectedAttributeMetadata.LogicalName;
-            selectedFormat = _selectedAttributeMetadata.attributeMetadata.AutoNumberFormat;
-
-
-            //var selectedFormat
-            WorkAsync(new WorkAsyncInfo
-            {
-                Message = "Started Updating Auto Numbers for " + _selectedEntity.Metadata.LogicalName + " Records which are missing auto numbers..",
-                Work = (worker, args) =>
-                {
-                    UpdateStatusMessage("Started Updating Auto Numbers for " + _selectedEntity.Metadata.LogicalName + " Records which are missing auto numbers..");
-
-
-                    if (!String.IsNullOrEmpty(selectedFormat))
-                    {
-
-                        foreach (var currentEntity in results.Entities)
-                        {
-                            var primaryName = currentEntity.Contains(_selectedEntity.Metadata.PrimaryNameAttribute) ? currentEntity[_selectedEntity.Metadata.PrimaryNameAttribute].ToString() : "";
-                            UpdateStatusMessage($"Started Processing Id: {currentEntity.Id} and {_selectedEntity.Metadata.PrimaryNameAttribute}:{primaryName}.. ");
-
-
-                            int nextValue = GuessSeed();                          
-                            var nextNumber = ParseNumberFormat(selectedFormat, nextValue.ToString());
-
-                            if (!string.IsNullOrEmpty(nextNumber))
-                            {
-                                Entity updateEntity = new Entity(currentEntity.LogicalName);
-                                updateEntity.Id = currentEntity.Id;
-                                updateEntity[selectedAttribute] = nextNumber;
-
-
-                                //only update if this not running under actual mode
-
-                                UpdateStatusMessage(
-                                    $" Record Id: {currentEntity.Id} and {_selectedEntity.Metadata.PrimaryNameAttribute}:{primaryName} will be updated with value  {selectedAttribute}:{nextNumber}");
-
-                                Service.Update(updateEntity);
-
-                                //UPDATE SEED TO ENSURE NEXT NUMBER GETS UPDATED!
-                                int seedValue = nextValue;
-                                OrganizationRequest customActionRequest = new OrganizationRequest("SetAutoNumberSeed");
-                                customActionRequest["EntityName"] = currentEntity.LogicalName;
-                                customActionRequest["AttributeName"] = selectedAttribute;
-                                customActionRequest["Value"] = Convert.ToInt64(nextValue);
-                                Service.Execute(customActionRequest);
-                            }
-                            else
-                            {
-
-                                UpdateStatusMessage($"Failed to Find Next number for Processing...");
-                                break;
-                            }
-
-                            UpdateStatusMessage($"Completed Processing Id: {currentEntity.Id} and {_selectedEntity.Metadata.PrimaryNameAttribute}:{primaryName}.. ");
-
-                            AddProgressStep();
-                        }
-                    }
-
-
-
-                },
-                PostWorkCallBack = (args) =>
-                {
-                    if (args.Error != null)
-                    {
-                        MessageBox.Show(args.Error.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    UpdateStatusMessage("Finish Updating Auto Numbers for " + _selectedEntity.Metadata.LogicalName + " Records which are missing auto numbers..");
-
-
-                },
-                IsCancelable = true
-            });
+            auditGridView.DataSource = results;
 
         }
-        private EntityCollection GetAllRecordsWithOutAutoNumberPopulated()
+        private List<EntityInfo> GetAuditRecordCounts()
         {
-            //var selectedAttributeMetadata = (AttributeProxy)cmbAttributes.SelectedItem;
-            var selectedAttribute = _selectedAttributeMetadata.LogicalName;
 
-            var results = new EntityCollection();
+            var entityList = MetadataHelper.LoadEntities(this.Service);
 
-            var query = new QueryExpression(_selectedEntity.Metadata.LogicalName)
+            var results = new List<EntityInfo>();
+            foreach (var entityMetadata in entityList.EntityMetadata)
             {
-                ColumnSet = new ColumnSet(_selectedEntity.Metadata.LogicalName + "id", _selectedEntity.Metadata.PrimaryNameAttribute, selectedAttribute),
-                PageInfo = new PagingInfo
-                {
-                    PageNumber = 1,
-                    PagingCookie = null,
-                    Count = 0x1388
-                },
-                Criteria = new FilterExpression(LogicalOperator.And)
-            };
-            query.Criteria.AddCondition(selectedAttribute, ConditionOperator.Null);
+                var isAuditEnabled = entityMetadata.IsAuditEnabled.Value;
+                var objectTypeCode = entityMetadata.ObjectTypeCode;
 
-            if (chkAscending.Checked)
-            {
-                query.AddOrder(attributeName: txtOrderAttribute.Text, orderType: OrderType.Ascending);
-            }
-            else
-            {
-                query.AddOrder(attributeName: txtOrderAttribute.Text, orderType: OrderType.Descending);
-            }
+                var auditFetchXML = @"<fetch aggregate='true'>"+
+                           "  <entity name='audit'>"+
+                           "    <attribute name='auditid' alias='count' aggregate='count' /> "+
+                           "    <filter>"+
+                           "      <condition attribute='objecttypecode' operator='eq' value='" + objectTypeCode + " ' /> "+
+                           "    </filter>"+
+                           "  </entity>"+
+                           "</fetch>";
 
-            if (_stateCode != -1)
-                query.Criteria.AddCondition("statecode", ConditionOperator.Equal,_stateCode);
+                var auditEntity = new FetchXmlHelper().FetchAll(this.Service, auditFetchXML);
+                int count = (int)(auditEntity[0]["count"] as AliasedValue).Value;
 
-            while (true)
-            {
-                var entities = this.Service.RetrieveMultiple(query);
-                results.Entities.AddRange(entities.Entities);
-                if (entities.MoreRecords)
-                {
-                    var pageInfo = query.PageInfo;
-                    pageInfo.PageNumber++;
-                    query.PageInfo.PagingCookie = entities.PagingCookie;
-                }
-                else
-                {
-                    break;
-                }
+                results.Add(new EntityInfo() { AuditEnabled = isAuditEnabled, EntityName=entityMetadata.LogicalName, ObjectTypeCode= entityMetadata.ObjectTypeCode.Value, Count=count });
             }
 
             return results;
         }
 
 
-        private void GetRecordsAndFixAutoNumbers()
+        private void GetAuditRecordCountByTable()
         {
            
             WorkAsync(new WorkAsyncInfo
             {
-                Message = "Getting " + _selectedEntity.Metadata.LogicalName + " Records which are missing auto numbers..",
+                Message = "Getting Audit Record Count by Each Table ..",
                 Work = (worker, args) =>
                 {
 
-                    var result = GetAllRecordsWithOutAutoNumberPopulated();
+                    var result = GetAuditRecordCounts();
                     args.Result = result;
 
                 },
@@ -597,18 +235,18 @@ namespace Sdmsols.XTB.AuditRecordCounterByTable
                     {
                         MessageBox.Show(args.Error.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    var result = args.Result as EntityCollection;
+                    var result = args.Result as List<EntityInfo>;
                     if (result != null)
                     {
                         //MessageBox.Show($"Found {result.Entities.Count} contacts");
-                        LogTextBoxAndProgressBar.UpdateStatusMessage(StatusText, $"Found {result.Entities.Count} {_selectedEntity.Metadata.LogicalName} Records.");
+                        LogTextBoxAndProgressBar.UpdateStatusMessage(StatusText, $"Found  total tables {result.Count}...");
                     }
 
                     if (result != null)
-                        LogTextBoxAndProgressBar.SetProgressBar(progressBar, result.Entities.Count);
+                        LogTextBoxAndProgressBar.SetProgressBar(progressBar, result.Count);
 
 
-                    FixEntityAutoNumbers(result);
+                    LoadGridView(result);
                 }
             });
         }

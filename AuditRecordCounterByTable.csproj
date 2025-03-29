@@ -200,8 +200,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\AttributeProxy.cs" />
+    <Compile Include="Helpers\EntityInfo.cs" />
     <Compile Include="Helpers\EntityMetadataProxy.cs" />
     <Compile Include="Helpers\ErrorLog.cs" />
+    <Compile Include="Helpers\FetchXmlHelper.cs" />
     <Compile Include="Helpers\LogTextBoxAndProgressBar.cs" />
     <Compile Include="Helpers\MetadataHelper.cs" />
     <Compile Include="MyPlugin.cs" />
